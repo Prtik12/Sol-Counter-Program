@@ -36,6 +36,29 @@ program_test.add_account(
 
 let (mut banks_client, payer, recent_blockhash) = program_test.start().await;
 
+let ix_data = InstructionType::Increment(5).try_to_vec().unwrap();
+let ix = Instruction::new_with_bytes(
+    program_id,
+    &ix_data,
+    vec![AccountMeta::new(counter_pubkey, false)],
+);
 
+let tx = Transaction::new_signed_with_payer(
+    &[ix],
+    Some(&payer.pubkey()),
+    &[&payer],
+    recent_blockhash,
+);
+
+banks_client.process_transaction(tx).await.unwrap();
+
+let updated_account = banks_client
+    .get_account(counter_pubkey)
+    .await
+    .unwrap()
+    .unwrap();
+
+let updated_data = Counter::try_from_slice(&updated_account.data).unwrap();
+assert_eq!(updated_data.count, 5);
 
 }
