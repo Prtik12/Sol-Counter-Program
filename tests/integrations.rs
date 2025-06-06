@@ -18,4 +18,24 @@ async fn test_increment_counter(){
         program_id,
         processor!(sol_counter_program::counter_contract),
     );
+
+let counter_data = Counter { count: 0 };
+let mut counter_account_data = vec![];
+counter_data.serialize(&mut counter_account_data).unwrap();
+
+program_test.add_account(
+    counter_pubkey,
+    Account {
+        lamports: 1_000_000,
+        data : counter_account_data,
+        owner: program_id,
+        executable: false,
+        rent_epoch: 0,
+    },
+);
+
+let (mut banks_client, payer, recent_blockhash) = program_test.start().await;
+
+
+
 }
