@@ -8,14 +8,15 @@ use solana_program::{
 };
 
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
-pub struct Counter {
-    pub count: u32,
-}
-
-#[derive(BorshSerialize, BorshDeserialize, Debug)]
 enum InstructionType {
     Increment(u32),
     Decrement(u32),
+}
+
+
+#[derive(BorshSerialize, BorshDeserialize, Debug)]
+struct Counter {
+    count: u32,
 }
 
 entrypoint!(counter_contract);
@@ -39,7 +40,7 @@ pub fn counter_contract(
         }
     }
 
-    counter_data.serialize(&mut &mut acc.data.borrow_mut()[..])?;
+    counter_data.serialize(&mut *acc.data.borrow_mut());
 
     msg!("Contract succeeded");
 
